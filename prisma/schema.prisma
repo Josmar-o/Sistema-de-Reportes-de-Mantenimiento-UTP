@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id        Int       @id @default(autoincrement())
+  nombre    String    @db.VarChar(100)
+  email     String    @unique @db.VarChar(100)
+  password  String    @db.VarChar(255)
+  rol       Rol       @default(estudiante)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  reportes  Reporte[]
+
+  @@map("usuarios")
+}
+
+model Reporte {
+  id              Int      @id @default(autoincrement())
+  descripcion     String   @db.Text
+  ubicacion       String   @db.VarChar(255)
+  foto_url        String?  @db.VarChar(500)
+  estado          Estado   @default(pendiente)
+  usuario_id      Int
+  fecha_creacion  DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  usuario         Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  @@map("reportes")
+  @@index([usuario_id])
+}
+
+enum Rol {
+  estudiante
+  admin
+}
+
+enum Estado {
+  pendiente
+  en_proceso
+  resuelto
+}
