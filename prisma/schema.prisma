@@ -43,6 +43,7 @@ model Reporte {
 enum Rol {
   estudiante
   admin
+  personal
 }
 
 enum Estado {
