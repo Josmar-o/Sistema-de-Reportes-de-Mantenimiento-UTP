@@ -19,12 +19,15 @@ import {
   BarChart3
 } from 'lucide-react';
 import { cn, obtenerIniciales, generarColorAvatar } from '@/lib/utils';
+import { useSidebar } from './SidebarContext';
 
 export default function Navbar() {
   const { usuario, logout } = useAuth();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const { toggleMobile: toggleSidebar } = useSidebar();
+  const hasSidebar = usuario?.rol === 'admin' || usuario?.rol === 'personal';
 
   if (!usuario) return null;
 
@@ -68,13 +71,25 @@ export default function Navbar() {
             <Link href={`/${usuario.rol}/dashboard`} className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
                 <Logo size="md" />
-                <span className="ml-3 text-xl font-bold text-gray-900 dark:text-white">
-                  Sistema de Reportes
+                <span className="ml-2 text-base sm:text-xl font-bold text-gray-900 dark:text-white hidden xs:block sm:block">
+                  <span className="hidden sm:inline">Sistema de Reportes</span>
+                  <span className="sm:hidden">Reportes</span>
                 </span>
               </div>
             </Link>
 
-            {/* Links Desktop */}
+            {/* Sidebar toggle — mobile only for admin/personal */}
+            {hasSidebar && (
+              <button
+                onClick={toggleSidebar}
+                className="md:hidden ml-3 p-2 rounded-md text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+                aria-label="Abrir menú lateral"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+            )}
+
+          {/* Links Desktop */}
             <div className="hidden md:ml-10 md:flex md:space-x-4">
               {navLinks.map((link) => {
                 const Icon = link.icon;

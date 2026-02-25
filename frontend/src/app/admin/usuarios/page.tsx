@@ -86,16 +86,16 @@ export default function AdminUsuariosPage() {
   return (
     <>
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+      <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
             Gestión de Usuarios
           </h1>
                 <p className="text-gray-600 dark:text-gray-400">
                   Administra todos los usuarios del sistema
                 </p>
               </div>
-              <Button onClick={() => setIsCreateModalOpen(true)}>
+              <Button onClick={() => setIsCreateModalOpen(true)} className="self-start sm:self-auto">
                 <UserPlus className="h-5 w-5 mr-2" />
                 Crear Usuario
               </Button>

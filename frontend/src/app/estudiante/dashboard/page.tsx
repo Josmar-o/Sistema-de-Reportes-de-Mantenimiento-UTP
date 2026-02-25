@@ -89,8 +89,8 @@ export default function EstudianteDashboard() {
   return (
     <>
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
           Mi Dashboard
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
@@ -135,8 +135,8 @@ export default function EstudianteDashboard() {
 
           {/* Últimos Reportes */}
           <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                 Últimos Reportes
               </h2>
               {reportes.length > 3 && (

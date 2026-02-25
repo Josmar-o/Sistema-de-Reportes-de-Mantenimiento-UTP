@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Download } from 'lucide-react';
+import { Download, FileText } from 'lucide-react';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import Button from '@/components/ui/Button';
 import ReporteCard from '@/components/reportes/ReporteCard';
@@ -128,23 +128,23 @@ export default function AdminReportesPage() {
   return (
     <>
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+      <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
             Gestión de Reportes
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Administra todos los reportes del sistema
           </p>
         </div>
-        <Button onClick={handleExportarCSV} variant="outline">
+        <Button onClick={handleExportarCSV} variant="outline" className="self-start sm:self-auto">
           <Download className="h-5 w-5 mr-2" />
           Exportar CSV
         </Button>
       </div>
 
       {/* Filtros */}
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <FiltrosReportes 
           onFiltrosChange={setFiltros}
           resultadosCount={reportesFiltrados.length}

@@ -94,8 +94,71 @@ export default function TablaUsuarios({
         </div>
       </div>
 
-      {/* Tabla */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-3">
+        {isLoading ? (
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 text-center text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
+            Cargando usuarios...
+          </div>
+        ) : usuariosFiltrados.length === 0 ? (
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 text-center text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
+            No se encontraron usuarios
+          </div>
+        ) : (
+          usuariosFiltrados.map((usuario) => (
+            <div key={usuario.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <div className={cn(
+                    'h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0',
+                    generarColorAvatar(usuario.nombre)
+                  )}>
+                    {obtenerIniciales(usuario.nombre)}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{usuario.nombre}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{usuario.email}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleEdit(usuario)}
+                    className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1"
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => onToggleActivo(usuario.id, !(usuario.activo !== false))}
+                    className="text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300 p-1"
+                  >
+                    {usuario.activo !== false ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
+                  </button>
+                  <button
+                    onClick={() => { if (confirm('¿Eliminar este usuario?')) onDelete(usuario.id); }}
+                    className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-1"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <Badge variant={getRolBadgeVariant(usuario.rol)}>
+                  {ROLES.find(r => r.value === usuario.rol)?.label}
+                </Badge>
+                {usuario.activo !== false ? (
+                  <Badge variant="success"><UserCheck className="h-3 w-3 mr-1 inline" />Activo</Badge>
+                ) : (
+                  <Badge variant="danger"><UserX className="h-3 w-3 mr-1 inline" />Inactivo</Badge>
+                )}
+                <span className="text-gray-400 dark:text-gray-500">{formatearFecha(usuario.creadoEn, 'PP')}</span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Table */}
+      <div className="hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">

@@ -65,12 +65,12 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
-          <div className="text-center mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 sm:p-8">
+          <div className="text-center mb-6 sm:mb-8">
             <div className="inline-flex items-center justify-center mb-4">
               <Logo size="lg" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Bienvenido</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">Bienvenido</h1>
             <p className="text-gray-600 dark:text-gray-400">Sistema de Reportes de Mantenimiento</p>
           </div>
 

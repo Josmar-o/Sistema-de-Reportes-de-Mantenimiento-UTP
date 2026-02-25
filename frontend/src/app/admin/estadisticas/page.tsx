@@ -55,16 +55,16 @@ export default function AdminEstadisticasPage() {
   return (
     <>
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+      <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
             Estadísticas Avanzadas
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Análisis detallado del sistema de reportes
           </p>
         </div>
-        <Button onClick={handleExportarPDF} variant="outline">
+        <Button onClick={handleExportarPDF} variant="outline" className="self-start sm:self-auto">
           <Download className="h-5 w-5 mr-2" />
           Exportar PDF
         </Button>
@@ -78,7 +78,7 @@ export default function AdminEstadisticasPage() {
                   Filtrar por Rango de Fechas
                 </h3>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
                 <Input
                   type="date"
                   label="Fecha de inicio"

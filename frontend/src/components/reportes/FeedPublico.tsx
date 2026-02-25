@@ -18,6 +18,7 @@ interface Reporte {
   prioridad: string;
   creadoEn: string;
   actualizadoEn: string;
+  fechaResolucion?: string;
   usuario: {
     id: number;
     nombre: string;
@@ -95,16 +96,14 @@ export default function FeedPublico() {
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Feed Público de Casos Resueltos
-            </h2>
-            <p className="text-sm text-gray-600 mt-1">
-              Reportes recientemente resueltos ({pagination.total} total)
-            </p>
-          </div>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
+        <div className="mb-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+            Feed Público de Casos Resueltos
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            Reportes recientemente resueltos ({pagination.total} total)
+          </p>
         </div>
 
         {reportes.length === 0 ? (
@@ -119,7 +118,7 @@ export default function FeedPublico() {
                   key={reporte.id}
                   className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
                 >
-                  <div className="flex items-start justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-start gap-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="text-lg font-semibold text-gray-900">
@@ -160,11 +159,11 @@ export default function FeedPublico() {
                     </div>
 
                     {reporte.fotoUrl && (
-                      <div className="ml-4 flex-shrink-0">
+                      <div className="flex-shrink-0 self-start">
                         <img
                           src={reporte.fotoUrl}
                           alt={reporte.titulo}
-                          className="w-24 h-24 object-cover rounded-lg"
+                          className="w-full sm:w-24 h-40 sm:h-24 object-cover rounded-lg"
                         />
                       </div>
                     )}
@@ -175,8 +174,8 @@ export default function FeedPublico() {
 
             {/* Paginación */}
             {pagination.totalPages > 1 && (
-              <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
-                <div className="text-sm text-gray-500">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="text-sm text-gray-500 dark:text-gray-400">
                   Página {pagination.page} de {pagination.totalPages}
                 </div>
                 <div className="flex gap-2">

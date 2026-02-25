@@ -115,16 +115,17 @@ export default function ReporteDetallePage() {
   return (
     <>
       {/* Header */}
-            <div className="mb-8 flex items-center gap-4">
+            <div className="mb-6 sm:mb-8 flex items-center gap-3">
               <Button
                 variant="ghost"
                 onClick={() => router.back()}
+                className="flex-shrink-0"
               >
-                <ArrowLeft className="h-5 w-5 mr-2" />
-                Volver
+                <ArrowLeft className="h-5 w-5 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Volver</span>
               </Button>
-              <div className="flex-1">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <div className="flex-1 min-w-0">
+                <h1 className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white truncate">
                   Detalle del Reporte
                 </h1>
               </div>

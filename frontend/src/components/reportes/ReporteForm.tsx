@@ -192,7 +192,7 @@ export default function ReporteForm() {
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
+            className={`border-2 border-dashed rounded-lg p-4 sm:p-8 text-center transition-colors cursor-pointer ${
               isDragging
                 ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
                 : 'border-gray-300 dark:border-gray-600 hover:border-primary-400'
@@ -241,7 +241,7 @@ export default function ReporteForm() {
       </div>
 
       {/* Botones */}
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row gap-3">
         <Button
           type="submit"
           isLoading={isSubmitting}
@@ -255,6 +255,7 @@ export default function ReporteForm() {
           variant="outline"
           onClick={() => router.back()}
           disabled={isSubmitting}
+          className="sm:w-auto"
         >
           Cancelar
         </Button>

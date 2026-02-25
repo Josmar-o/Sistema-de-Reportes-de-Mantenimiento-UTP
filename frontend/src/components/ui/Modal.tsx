@@ -38,11 +38,11 @@ export default function Modal({
       />
       
       {/* Modal */}
-      <div className="flex min-h-full items-center justify-center p-4">
+      <div className="flex min-h-full items-center justify-center p-2 sm:p-4">
         <div 
           className={cn(
             'relative w-full bg-white dark:bg-gray-800 rounded-lg shadow-xl',
-            'transform transition-all',
+            'transform transition-all mx-2 sm:mx-0',
             sizeClasses[size]
           )}
           onClick={(e) => e.stopPropagation()}
@@ -51,14 +51,14 @@ export default function Modal({
           {(title || showCloseButton) && (
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
               {title && (
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white pr-2">
                   {title}
                 </h3>
               )}
               {showCloseButton && (
                 <button
                   onClick={onClose}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  className="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -67,7 +67,7 @@ export default function Modal({
           )}
           
           {/* Content */}
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             {children}
           </div>
         </div>

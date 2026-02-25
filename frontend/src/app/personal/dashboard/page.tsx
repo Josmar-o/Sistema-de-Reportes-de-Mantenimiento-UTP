@@ -106,8 +106,8 @@ export default function PersonalDashboard() {
   return (
     <>
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
           Dashboard de Personal
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
@@ -147,8 +147,8 @@ export default function PersonalDashboard() {
                 {/* Reportes Pendientes */}
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
                   <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                         Reportes Pendientes
                       </h2>
                       <Link href="/personal/reportes">
@@ -182,11 +182,11 @@ export default function PersonalDashboard() {
                               <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-1">
                                 {reporte.descripcion}
                               </p>
-                              <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                        <div className="flex flex-wrap items-start gap-x-3 gap-y-1 text-xs text-gray-500 dark:text-gray-400">
                                 <span>{reporte.ubicacion}</span>
-                                <span>•</span>
+                                <span className="hidden sm:inline">•</span>
                                 <span>{reporte.usuario?.nombre}</span>
-                                <span>•</span>
+                                <span className="hidden sm:inline">•</span>
                                 <span>{formatearFechaRelativa(reporte.creadoEn)}</span>
                               </div>
                             </div>
