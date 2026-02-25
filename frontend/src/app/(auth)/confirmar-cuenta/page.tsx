@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import api from '@/lib/axios';
 import Link from 'next/link';
 
-export default function ConfirmarCuentaPage() {
+function ConfirmarCuentaContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const [estado, setEstado] = useState<'cargando' | 'exito' | 'error'>('cargando');
@@ -86,5 +86,13 @@ export default function ConfirmarCuentaPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ConfirmarCuentaPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" /></div>}>
+      <ConfirmarCuentaContent />
+    </Suspense>
   );
 }
