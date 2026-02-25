@@ -30,6 +30,7 @@ Thumbs.db
 # Build
 dist/
 build/
+DEPLOY.md
 
 # Uploads (si hay subida de archivos)
 uploads/
