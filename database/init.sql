@@ -17,11 +17,31 @@ CREATE TABLE IF NOT EXISTS usuarios (
     nombre VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    rol ENUM('estudiante', 'admin') DEFAULT 'estudiante',
-    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    rol ENUM('estudiante', 'admin', 'personal') DEFAULT 'estudiante',
+    activo BOOLEAN DEFAULT FALSE,
+
+    -- Verificación de email inicial
+    email_verificado BOOLEAN DEFAULT FALSE,
+    email_token VARCHAR(255) NULL,
+    email_token_expira DATETIME NULL,
+    fecha_verificacion DATETIME NULL,
+
+    -- Confirmación anual
+    ultima_confirmacion_anual DATETIME NULL,
+    token_confirmacion_anual VARCHAR(255) NULL,
+    token_anual_expira DATETIME NULL,
+    confirmacion_anual_enviada DATETIME NULL,
+
+    -- Reset de contraseña
+    reset_password_token VARCHAR(255) NULL,
+    reset_password_expira DATETIME NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_email (email),
-    INDEX idx_rol (rol)
+    INDEX idx_rol (rol),
+    INDEX idx_email_token (email_token),
+    INDEX idx_reset_token (reset_password_token)
 ) ENGINE=InnoDB;
 
 -- ============================================

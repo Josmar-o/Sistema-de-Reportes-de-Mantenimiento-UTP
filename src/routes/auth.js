@@ -1,45 +1,59 @@
 const express = require('express');
 const router = express.Router();
-const { body } = require('express-validator');
-const { register, login, getProfile } = require('../controllers/authController');
+const { body, query } = require('express-validator');
+const {
+  register, verificarEmail, reenviarVerificacion,
+  login, forgotPassword, resetPassword,
+  getProfile, cambiarPassword, confirmarCuentaAnual,
+} = require('../controllers/authController');
 const { authenticate } = require('../middlewares/auth');
 const validate = require('../middlewares/validate');
 
-// Validaciones para registro
+// ── Validaciones ─────────────────────────────
+
 const registerValidation = [
-  body('nombre')
-    .trim()
-    .notEmpty().withMessage('El nombre es requerido')
-    .isLength({ min: 2, max: 100 }).withMessage('El nombre debe tener entre 2 y 100 caracteres'),
-  body('email')
-    .trim()
-    .notEmpty().withMessage('El email es requerido')
-    .isEmail().withMessage('Debe ser un email válido')
-    .normalizeEmail(),
-  body('password')
-    .notEmpty().withMessage('La contraseña es requerida')
-    .isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
-  body('rol')
-    .optional()
-    .isIn(['estudiante', 'admin']).withMessage('El rol debe ser estudiante o admin'),
-  validate
+  body('nombre').trim().notEmpty().withMessage('El nombre es requerido').isLength({ min: 2, max: 100 }),
+  body('email').trim().notEmpty().isEmail().withMessage('Email inválido').normalizeEmail(),
+  body('password').notEmpty().isLength({ min: 6 }).withMessage('Mínimo 6 caracteres'),
+  body('rol').optional().isIn(['estudiante', 'admin', 'personal']).withMessage('Rol inválido'),
+  validate,
 ];
 
-// Validaciones para login
 const loginValidation = [
-  body('email')
-    .trim()
-    .notEmpty().withMessage('El email es requerido')
-    .isEmail().withMessage('Debe ser un email válido')
-    .normalizeEmail(),
-  body('password')
-    .notEmpty().withMessage('La contraseña es requerida'),
-  validate
+  body('email').trim().notEmpty().isEmail().normalizeEmail(),
+  body('password').notEmpty(),
+  validate,
 ];
 
-// Rutas
-router.post('/register', registerValidation, register);
+const emailValidation = [
+  body('email').trim().notEmpty().isEmail().normalizeEmail(),
+  validate,
+];
+
+const resetPasswordValidation = [
+  body('token').notEmpty().withMessage('Token requerido'),
+  body('password').notEmpty().isLength({ min: 6 }).withMessage('Mínimo 6 caracteres'),
+  validate,
+];
+
+const cambiarPasswordValidation = [
+  body('passwordActual').notEmpty().withMessage('La contraseña actual es requerida'),
+  body('passwordNueva').notEmpty().isLength({ min: 6 }).withMessage('Mínimo 6 caracteres'),
+  validate,
+];
+
+// ── Rutas públicas ────────────────────────────
+router.post('/registro', registerValidation, register);
+router.post('/register', registerValidation, register);        // alias
+router.get('/verificar-email', verificarEmail);               // ?token=xxx
+router.post('/reenviar-verificacion', emailValidation, reenviarVerificacion);
 router.post('/login', loginValidation, login);
+router.post('/forgot-password', emailValidation, forgotPassword);
+router.post('/reset-password', resetPasswordValidation, resetPassword);
+router.get('/confirmar-cuenta', confirmarCuentaAnual);        // ?token=xxx (confirmación anual)
+
+// ── Rutas protegidas ──────────────────────────
 router.get('/profile', authenticate, getProfile);
+router.put('/cambiar-password', authenticate, cambiarPasswordValidation, cambiarPassword);
 
 module.exports = router;

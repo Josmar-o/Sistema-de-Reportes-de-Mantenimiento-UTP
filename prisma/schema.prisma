@@ -16,6 +16,24 @@ model Usuario {
   email     String    @unique @db.VarChar(100)
   password  String    @db.VarChar(255)
   rol       Rol       @default(estudiante)
+  activo    Boolean   @default(false)
+
+  // Verificación de email inicial
+  emailVerificado     Boolean   @default(false)
+  emailToken          String?   @db.VarChar(255)
+  emailTokenExpira    DateTime?
+  fechaVerificacion   DateTime?
+
+  // Confirmación anual
+  ultimaConfirmacionAnual   DateTime?
+  tokenConfirmacionAnual    String?   @db.VarChar(255)
+  tokenAnualExpira          DateTime?
+  confirmacionAnualEnviada  DateTime?
+
+  // Reset de contraseña
+  resetPasswordToken   String?   @db.VarChar(255)
+  resetPasswordExpira  DateTime?
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   
@@ -26,10 +44,16 @@ model Usuario {
 
 model Reporte {
   id              Int      @id @default(autoincrement())
+  titulo          String   @db.VarChar(255)
   descripcion     String   @db.Text
   ubicacion       String   @db.VarChar(255)
+  categoria       String   @db.VarChar(100)
   foto_url        String?  @db.VarChar(500)
   estado          Estado   @default(pendiente)
+  prioridad       Prioridad @default(media)
+  nota_personal   String?  @db.Text
+  publicInFeed    Boolean  @default(false)
+  fechaResolucion DateTime?
   usuario_id      Int
   fecha_creacion  DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -38,6 +62,9 @@ model Reporte {
 
   @@map("reportes")
   @@index([usuario_id])
+  @@index([estado])
+  @@index([categoria])
+  @@index([publicInFeed])
 }
 
 enum Rol {
@@ -50,4 +77,10 @@ enum Estado {
   pendiente
   en_proceso
   resuelto
+}
+
+enum Prioridad {
+  baja
+  media
+  alta
 }

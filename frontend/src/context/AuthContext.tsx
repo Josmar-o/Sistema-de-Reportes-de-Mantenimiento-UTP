@@ -53,13 +53,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data } = await api.post<AuthResponse>('/auth/login', credentials);
       
-      setToken(data.token);
-      setUsuario(data.usuario);
+      // La respuesta viene como: { success, message, data: { token, usuario } }
+      setToken(data.data.token);
+      setUsuario(data.data.usuario);
       
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('usuario', JSON.stringify(data.usuario));
+      localStorage.setItem('token', data.data.token);
+      localStorage.setItem('usuario', JSON.stringify(data.data.usuario));
       
-      toast.success(`¡Bienvenido, ${data.usuario.nombre}!`);
+      toast.success(`¡Bienvenido, ${data.data.usuario.nombre}!`);
       
       // Redirigir según el rol
       const dashboardRoutes: Record<Rol, string> = {
@@ -68,10 +69,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         admin: '/admin/dashboard',
       };
       
-      router.push(dashboardRoutes[data.usuario.rol]);
+      router.push(dashboardRoutes[data.data.usuario.rol]);
     } catch (error: any) {
       console.error('Error en login:', error);
-      const mensaje = error.response?.data?.mensaje || 'Error al iniciar sesión';
+      const mensaje = error.response?.data?.message || error.response?.data?.mensaje || 'Error al iniciar sesión';
       toast.error(mensaje);
       throw error;
     }
@@ -79,19 +80,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (data: RegisterData) => {
     try {
-      const response = await api.post<AuthResponse>('/auth/registro', data);
-      
-      setToken(response.data.token);
-      setUsuario(response.data.usuario);
-      
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('usuario', JSON.stringify(response.data.usuario));
-      
-      toast.success('¡Registro exitoso! Bienvenido.');
-      router.push('/estudiante/dashboard');
+      await api.post('/auth/registro', data);
+      // La cuenta se crea pero necesita verificación de email
+      toast.success('¡Cuenta creada! Revisa tu correo para verificarla.', { duration: 6000 });
+      router.push('/login');
     } catch (error: any) {
       console.error('Error en registro:', error);
-      const mensaje = error.response?.data?.mensaje || 'Error al registrarse';
+      const mensaje = error.response?.data?.message || 'Error al registrarse';
       toast.error(mensaje);
       throw error;
     }

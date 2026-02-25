@@ -7,7 +7,7 @@ Sistema completo de gestión de reportes de mantenimiento universitario con tres
 ### Backend
 - **Node.js** + **Express** - Framework del servidor
 - **Prisma ORM** - Gestión de base de datos
-- **PostgreSQL** - Base de datos
+- **MySQL** - Base de datos
 - **JWT** - Autenticación y autorización
 - **Multer** - Manejo de archivos
 - **bcryptjs** - Encriptación de contraseñas
@@ -26,7 +26,7 @@ Sistema completo de gestión de reportes de mantenimiento universitario con tres
 Antes de comenzar, asegúrate de tener instalado:
 
 - **Node.js** 18 o superior ([Descargar](https://nodejs.org/))
-- **PostgreSQL** 14 o superior ([Descargar](https://www.postgresql.org/download/))
+- **MySQL** 8.0 o superior ([Descargar](https://dev.mysql.com/downloads/mysql/))
 - **npm** o **yarn** (viene con Node.js)
 - **Git** (opcional)
 
@@ -44,16 +44,16 @@ cd proyecto-mantenimiento
 
 ### 2. Configurar la Base de Datos
 
-**Crear la base de datos en PostgreSQL:**
+**Crear la base de datos en MySQL:**
 
 ```bash
-# Opción 1: Desde la terminal
-createdb mantenimiento_utp
-
-# Opción 2: Desde psql
-psql -U postgres
+# Opción 1: Desde MySQL CLI
+mysql -u root -p
 CREATE DATABASE mantenimiento_utp;
-\q
+exit;
+
+# Opción 2: Desde MySQL Workbench
+# Crear una nueva conexión y ejecutar: CREATE DATABASE mantenimiento_utp;
 ```
 
 ### 3. Configurar el Backend
@@ -69,8 +69,8 @@ cp .env.example .env
 **Editar el archivo `.env` con tus credenciales:**
 
 ```env
-# URL de conexión a PostgreSQL
-DATABASE_URL="postgresql://usuario:password@localhost:5432/mantenimiento_utp"
+# URL de conexión a MySQL
+DATABASE_URL="mysql://usuario:password@localhost:3306/mantenimiento_utp"
 
 # Secreto para JWT (cambia esto por algo más seguro)
 JWT_SECRET="tu_secreto_super_seguro_aqui_cambiar_en_produccion"
@@ -380,18 +380,18 @@ curl -X POST http://localhost:3001/api/auth/login \
 ## 🐛 Solución de Problemas
 
 ### Error: "Cannot connect to database"
-- ✅ Verificar que PostgreSQL esté corriendo
+- ✅ Verificar que MySQL esté corriendo
 - ✅ Verificar credenciales en `.env`
 - ✅ Verificar que la base de datos `mantenimiento_utp` existe
 
 ### Error: "Port 3000 or 3001 already in use"
 ```bash
 # Windows - Liberar puerto
-netstat -ano | findstr :3000
+netstat -ano | findstr :3001
 taskkill /PID <PID> /F
 
 # Linux/Mac - Liberar puerto
-lsof -ti:3000 | xargs kill -9
+lsof -ti:3001 | xargs kill -9
 ```
 
 ### Error: "Prisma Client not generated"
@@ -456,15 +456,15 @@ npm start
 - Railway
 
 **Base de Datos:**
-- Supabase
-- Neon
+- PlanetScale
 - Railway
-- ElephantSQL
+- Aiven
+- DigitalOcean Managed MySQL
 
 ### Variables de Entorno en Producción
 
 Asegúrate de configurar:
-- `DATABASE_URL` - URL de PostgreSQL en producción
+- `DATABASE_URL` - URL de MySQL en producción
 - `JWT_SECRET` - Secreto seguro y aleatorio
 - `NEXT_PUBLIC_API_URL` - URL del backend en producción
 

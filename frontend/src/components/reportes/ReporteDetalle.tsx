@@ -124,31 +124,16 @@ export default function ReporteDetalle({ reporte }: ReporteDetalleProps) {
         </div>
       </div>
 
-      {/* Notas */}
-      {reporte.notas && reporte.notas.length > 0 && (
+      {/* Nota del Personal */}
+      {reporte.notaPersonal && (
         <div>
           <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-            Notas del Personal
+            Nota del Personal
           </h3>
-          <div className="space-y-3">
-            {reporte.notas.map((nota) => (
-              <div
-                key={nota.id}
-                className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700"
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {nota.usuario?.nombre || 'Personal'}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {formatearFechaRelativa(nota.creadoEn)}
-                  </p>
-                </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {nota.contenido}
-                </p>
-              </div>
-            ))}
+          <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+              {reporte.notaPersonal}
+            </p>
           </div>
         </div>
       )}

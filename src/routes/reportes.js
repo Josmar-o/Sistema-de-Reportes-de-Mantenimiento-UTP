@@ -7,13 +7,20 @@ const {
   createReporte,
   updateReporte,
   deleteReporte,
-  getMisReportes
+  getMisReportes,
+  getFeedPublico
 } = require('../controllers/reportesController');
 const { authenticate } = require('../middlewares/auth');
 const validate = require('../middlewares/validate');
+const upload = require('../config/multer');
 
 // Validaciones para crear reporte
 const createReporteValidation = [
+  body('titulo')
+    .trim()
+    .notEmpty().withMessage('El título es requerido')
+    .isLength({ min: 5 }).withMessage('El título debe tener al menos 5 caracteres')
+    .isLength({ max: 255 }).withMessage('El título no debe exceder 255 caracteres'),
   body('descripcion')
     .trim()
     .notEmpty().withMessage('La descripción es requerida')
@@ -22,10 +29,10 @@ const createReporteValidation = [
     .trim()
     .notEmpty().withMessage('La ubicación es requerida')
     .isLength({ max: 255 }).withMessage('La ubicación no debe exceder 255 caracteres'),
-  body('foto_url')
-    .optional()
-    .isURL().withMessage('Debe ser una URL válida')
-    .isLength({ max: 500 }).withMessage('La URL no debe exceder 500 caracteres'),
+  body('categoria')
+    .trim()
+    .notEmpty().withMessage('La categoría es requerida')
+    .isLength({ max: 100 }).withMessage('La categoría no debe exceder 100 caracteres'),
   validate
 ];
 
@@ -37,6 +44,11 @@ const updateReporteValidation = [
     .optional()
     .isIn(['pendiente', 'en_proceso', 'resuelto'])
     .withMessage('El estado debe ser: pendiente, en_proceso o resuelto'),
+  body('titulo')
+    .optional()
+    .trim()
+    .isLength({ min: 5 }).withMessage('El título debe tener al menos 5 caracteres')
+    .isLength({ max: 255 }).withMessage('El título no debe exceder 255 caracteres'),
   body('descripcion')
     .optional()
     .trim()
@@ -45,10 +57,21 @@ const updateReporteValidation = [
     .optional()
     .trim()
     .isLength({ max: 255 }).withMessage('La ubicación no debe exceder 255 caracteres'),
-  body('foto_url')
+  body('categoria')
     .optional()
-    .isURL().withMessage('Debe ser una URL válida')
-    .isLength({ max: 500 }).withMessage('La URL no debe exceder 500 caracteres'),
+    .trim()
+    .isLength({ max: 100 }).withMessage('La categoría no debe exceder 100 caracteres'),
+  body('prioridad')
+    .optional()
+    .isIn(['baja', 'media', 'alta'])
+    .withMessage('La prioridad debe ser: baja, media o alta'),
+  body('publicInFeed')
+    .optional()
+    .custom((value) => {
+      // Aceptar boolean o string 'true'/'false'
+      return value === true || value === false || value === 'true' || value === 'false';
+    })
+    .withMessage('publicInFeed debe ser un valor booleano'),
   validate
 ];
 
@@ -77,8 +100,9 @@ const queryValidation = [
 // Rutas públicas (requieren autenticación)
 router.get('/', authenticate, queryValidation, getAllReportes);
 router.get('/mis-reportes', authenticate, getMisReportes);
+router.get('/feed-publico', authenticate, queryValidation, getFeedPublico);
 router.get('/:id', authenticate, getByIdValidation, getReporteById);
-router.post('/', authenticate, createReporteValidation, createReporte);
+router.post('/', authenticate, upload.single('foto'), createReporteValidation, createReporte);
 router.put('/:id', authenticate, updateReporteValidation, updateReporte);
 router.delete('/:id', authenticate, getByIdValidation, deleteReporte);
 

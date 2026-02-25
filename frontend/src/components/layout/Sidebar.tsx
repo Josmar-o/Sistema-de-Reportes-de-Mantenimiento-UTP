@@ -9,6 +9,7 @@ import {
   FileText,
   Users,
   BarChart3,
+  Settings,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
@@ -27,6 +28,7 @@ export default function Sidebar() {
       return [
         { href: '/personal/dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { href: '/personal/reportes', label: 'Todos los Reportes', icon: FileText },
+        { href: '/personal/configuracion', label: 'Configuración', icon: Settings },
       ];
     }
     
@@ -36,6 +38,7 @@ export default function Sidebar() {
         { href: '/admin/reportes', label: 'Reportes', icon: FileText },
         { href: '/admin/usuarios', label: 'Usuarios', icon: Users },
         { href: '/admin/estadisticas', label: 'Estadísticas', icon: BarChart3 },
+        { href: '/admin/configuracion', label: 'Configuración', icon: Settings },
       ];
     }
     

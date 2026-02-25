@@ -30,6 +30,9 @@ export interface Reporte {
   fotoUrl: string | null;
   estado: EstadoReporte;
   prioridad?: Prioridad;
+  notaPersonal?: string;
+  publicInFeed?: boolean;
+  fechaResolucion?: string | null;
   usuarioId: number;
   usuario?: Usuario;
   creadoEn: string;
@@ -47,8 +50,12 @@ export interface Nota {
 }
 
 export interface AuthResponse {
-  token: string;
-  usuario: Usuario;
+  success: boolean;
+  message: string;
+  data: {
+    token: string;
+    usuario: Usuario;
+  };
 }
 
 export interface LoginCredentials {

@@ -8,7 +8,8 @@ import { UserPlus } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
-import { validarEmail, validarEmailUTP } from '@/lib/utils';
+import Logo from '@/components/ui/Logo';
+import { validarEmail } from '@/lib/utils';
 import type { RegisterData } from '@/types';
 
 interface RegisterFormData extends RegisterData {
@@ -57,8 +58,8 @@ export default function RegistroPage() {
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
           {/* Logo y Título */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center h-16 w-16 bg-utp-red rounded-full mb-4">
-              <span className="text-white font-bold text-2xl">UTP</span>
+            <div className="inline-flex items-center justify-center mb-4">
+              <Logo size="lg" />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
               Crear Cuenta
@@ -86,16 +87,14 @@ export default function RegistroPage() {
 
             <Input
               type="email"
-              label="Email institucional"
-              placeholder="tu.nombre@utp.ac.pa"
+              label="Email"
+              placeholder="tu.correo@gmail.com"
               error={errors.email?.message}
-              helperText="Debes usar tu email institucional @utp.ac.pa"
               required
               {...register('email', {
                 required: 'El email es requerido',
                 validate: {
                   validEmail: (value) => validarEmail(value) || 'Email inválido',
-                  utpEmail: (value) => validarEmailUTP(value) || 'Debes usar un email @utp.ac.pa'
                 }
               })}
             />

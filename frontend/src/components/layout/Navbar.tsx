@@ -4,6 +4,7 @@ import { useState, Fragment } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import Logo from '@/components/ui/Logo';
 import { 
   Menu, 
   X, 
@@ -26,6 +27,8 @@ export default function Navbar() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   if (!usuario) return null;
+
+  const configuracionHref = `/${usuario.rol}/configuracion`;
 
   // Enlaces según el rol del usuario
   const getNavLinks = () => {
@@ -64,9 +67,7 @@ export default function Navbar() {
             {/* Logo */}
             <Link href={`/${usuario.rol}/dashboard`} className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <div className="h-10 w-10 bg-utp-red rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">UTP</span>
-                </div>
+                <Logo size="md" />
                 <span className="ml-3 text-xl font-bold text-gray-900 dark:text-white">
                   Sistema de Reportes
                 </span>
@@ -140,10 +141,14 @@ export default function Navbar() {
                         {usuario.email}
                       </p>
                     </div>
-                    <button className="w-full flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <Link 
+                      href={configuracionHref}
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="w-full flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
                       <Settings className="h-4 w-4 mr-2" />
                       Configuración
-                    </button>
+                    </Link>
                     <button 
                       onClick={logout}
                       className="w-full flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"

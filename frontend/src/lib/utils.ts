@@ -13,16 +13,38 @@ export function cn(...inputs: ClassValue[]) {
  * Formatea una fecha a formato legible
  */
 export function formatearFecha(fecha: string | Date, formato: string = 'PPP'): string {
-  const date = typeof fecha === 'string' ? parseISO(fecha) : fecha;
-  return format(date, formato, { locale: es });
+  try {
+    const date = typeof fecha === 'string' ? parseISO(fecha) : fecha;
+    
+    // Validar que la fecha sea válida
+    if (isNaN(date.getTime())) {
+      return 'Fecha inválida';
+    }
+    
+    return format(date, formato, { locale: es });
+  } catch (error) {
+    console.error('Error al formatear fecha:', error, fecha);
+    return 'Fecha inválida';
+  }
 }
 
 /**
  * Formatea una fecha de manera relativa ("hace 2 horas")
  */
 export function formatearFechaRelativa(fecha: string | Date): string {
-  const date = typeof fecha === 'string' ? parseISO(fecha) : fecha;
-  return formatDistanceToNow(date, { addSuffix: true, locale: es });
+  try {
+    const date = typeof fecha === 'string' ? parseISO(fecha) : fecha;
+    
+    // Validar que la fecha sea válida
+    if (isNaN(date.getTime())) {
+      return 'Fecha inválida';
+    }
+    
+    return formatDistanceToNow(date, { addSuffix: true, locale: es });
+  } catch (error) {
+    console.error('Error al formatear fecha:', error, fecha);
+    return 'Fecha inválida';
+  }
 }
 
 /**
