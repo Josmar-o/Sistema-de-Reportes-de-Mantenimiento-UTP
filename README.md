@@ -1,6 +1,145 @@
 # Sistema de Reportes de Mantenimiento - UTP
 
-Sistema completo de gestión de reportes de mantenimiento universitario con tres roles de usuario: Estudiante, Personal y Administrador.
+## 📖 Descripción General
+
+El **Sistema de Reportes de Mantenimiento UTP** es una plataforma web integral diseñada para facilitar la comunicación y gestión de problemas de infraestructura dentro de la Universidad Tecnológica de Panamá. 
+
+### ¿Qué problema resuelve?
+
+Antes de este sistema, los estudiantes no tenían una forma estructurada de reportar problemas de mantenimiento (baños dañados, aires acondicionados, luces, equipos, etc.). Este sistema digitaliza y centraliza todo el proceso de reporte, seguimiento y resolución de incidencias.
+
+### ¿Cómo funciona?
+
+```
+📱 Estudiante → Crea reporte con foto
+              ↓
+👷 Personal → Revisa y gestiona
+              ↓
+✅ Resolución → Estudiante es notificado
+              ↓
+📊 Admin → Analiza estadísticas
+```
+
+## 🎯 Funcionalidades Principales
+
+### Para Estudiantes 👨‍🎓
+- **Crear reportes** con foto, ubicación, categoría y descripción
+- **Seguimiento en tiempo real** del estado de sus reportes
+- **Dashboard personalizado** con sus estadísticas
+- **Feed público** para ver reportes resueltos de otros estudiantes
+- **Notificaciones por email** cuando cambia el estado de su reporte
+
+### Para Personal de Mantenimiento 👷
+- **Visualizar todos los reportes** del sistema
+- **Cambiar estados**: Pendiente → En Proceso → Resuelto
+- **Asignar prioridades**: Baja, Media, Alta
+- **Agregar notas** de seguimiento privadas
+- **Decidir visibilidad**: Publicar o mantener privado en el feed
+- **Dashboard con métricas** de productividad
+
+### Para Administradores 👨‍💼
+- **Gestión completa de usuarios** (crear, editar, desactivar)
+- **Cambiar roles** de usuarios
+- **Estadísticas avanzadas** con gráficos
+- **Análisis por categoría y ubicación**
+- **Exportar reportes** (CSV/PDF)
+- **Configuración del sistema**
+
+## 🔐 Sistema de Autenticación y Seguridad
+
+### Registro y Verificación
+1. **Registro**: Solo emails `@utp.ac.pa` pueden registrarse
+2. **Verificación por email**: Al registrarse, se envía un correo con token de verificación (válido 24 horas)
+3. **Activación de cuenta**: El usuario debe hacer clic en el enlace antes de poder iniciar sesión
+
+### Verificación Anual Automática 📅
+**Importante**: Este sistema implementa un mecanismo único de verificación anual:
+
+- **Cada año**, el sistema envía automáticamente un correo de "confirmación anual" a todos los usuarios
+- **Objetivo**: Verificar que los estudiantes/personal siguen activos en la UTP
+- **Plazo**: El usuario tiene **30 días** para confirmar que sigue activo
+- **Consecuencia**: Si no confirma en 30 días, la cuenta se **desactiva automáticamente**
+- **Reactivación**: Solo un administrador puede reactivar cuentas desactivadas
+
+**Mensaje al registrarse**:
+> "Recuerda: cada año recibirás un correo para confirmar que sigues siendo parte de la UTP. Si no confirmas en 30 días, tu cuenta será desactivada automáticamente."
+
+### Cron Job de Verificación
+El sistema ejecuta diariamente (a las 8:00 AM) un proceso que:
+- Revisa cuentas que cumplan 1 año desde su última confirmación
+- Envía emails de recordatorio
+- Desactiva cuentas que no confirmaron en 30 días
+
+## 🗄️ Arquitectura de Base de Datos
+
+### ORM: Prisma
+
+El sistema utiliza **Prisma ORM**, una herramienta moderna que:
+- ✅ Genera tipos TypeScript automáticamente
+- ✅ Migraciones de base de datos versionadas
+- ✅ Query builder type-safe
+- ✅ Prisma Studio para visualizar datos
+
+### Esquema de Base de Datos
+
+#### Tabla: `Usuario`
+```prisma
+model Usuario {
+  id                    Int       @id @default(autoincrement())
+  nombre                String
+  email                 String    @unique
+  password              String    // Hash bcrypt
+  rol                   Rol       @default(estudiante)
+  activo                Boolean   @default(false)
+  emailVerified         Boolean   @default(false)
+  emailVerificationToken String?
+  emailVerificationExpires DateTime?
+  ultimaConfirmacionAnual DateTime?
+  reportes              Reporte[]
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+```
+
+#### Tabla: `Reporte`
+```prisma
+model Reporte {
+  id             Int       @id @default(autoincrement())
+  titulo         String
+  descripcion    String    @db.Text
+  categoria      String    // "Baño", "Aire", "Electricidad", etc.
+  ubicacion      String    // Edificio y salón
+  estado         String    @default("pendiente")
+  prioridad      String    @default("media")
+  foto_url       String?
+  nota_personal  String?   @db.Text
+  publicInFeed   Boolean   @default(false)
+  fecha_reporte  DateTime  @default(now())
+  fecha_resolucion DateTime?
+  usuario        Usuario   @relation(fields: [usuarioId], references: [id])
+  usuarioId      Int
+}
+```
+
+### Migraciones
+Todas las migraciones están en `prisma/migrations/` con versionado automático:
+- `20260213215138_mantenimiento_utp` - Schema inicial
+- `20260213220128_add_personal_role` - Agregado rol Personal
+- `20260224183045_add_titulo_categoria_prioridad` - Campos adicionales
+- `20260224205316_add_nota_personal` - Notas privadas
+- `20260225143728_add_email_verification_fields` - Sistema de verificación
+- `20260225173113_add_public_in_feed` - Feed público
+- `20260225181302_add_fecha_resolucion` - Fecha de resolución
+
+## 📧 Sistema de Emails (Mailgun)
+
+El sistema envía emails automáticos para:
+1. **Verificación de cuenta** (al registrarse)
+2. **Recuperación de contraseña**
+3. **Confirmación anual** (cada año)
+4. **Notificaciones de estado** (cuando cambia el estado de un reporte)
+
+**Configuración**: Usa Mailgun API para envío transaccional confiable.
 
 ## 🚀 Stack Tecnológico
 
@@ -20,6 +159,127 @@ Sistema completo de gestión de reportes de mantenimiento universitario con tres
 - **React Hook Form** - Gestión de formularios
 - **React Hot Toast** - Notificaciones
 - **Lucide React** - Iconos
+
+### Infraestructura y Despliegue
+- **Nginx** - Reverse proxy y servidor web
+- **PM2** - Process manager para Node.js
+- **Let's Encrypt** - Certificados SSL/TLS
+- **Mailgun** - Servicio de emails transaccionales
+- **Hetzner Cloud** - Hosting VPS
+
+## 🔄 Flujo de Trabajo del Sistema
+
+### 1. Ciclo de Vida de un Reporte
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ ESTUDIANTE                                                  │
+│ ┌──────────────────────────────────────────────────────┐   │
+│ │ 1. Login → Dashboard → Crear Reporte                 │   │
+│ │ 2. Llena formulario (título, descripción, categoría) │   │
+│ │ 3. Sube foto del problema                            │   │
+│ │ 4. Selecciona ubicación (edificio, salón)            │   │
+│ │ 5. Envía reporte → Estado: PENDIENTE                 │   │
+│ └──────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│ PERSONAL DE MANTENIMIENTO                                   │
+│ ┌──────────────────────────────────────────────────────┐   │
+│ │ 1. Ve todos los reportes pendientes                  │   │
+│ │ 2. Revisa detalles y foto                            │   │
+│ │ 3. Cambia estado a: EN PROCESO                       │   │
+│ │ 4. Asigna prioridad (Baja/Media/Alta)                │   │
+│ │ 5. Agrega nota interna (opcional)                    │   │
+│ │ 6. Realiza el mantenimiento                          │   │
+│ │ 7. Cambia estado a: RESUELTO                         │   │
+│ │ 8. Decide si publicar en feed público                │   │
+│ └──────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│ ESTUDIANTE (Notificado)                                     │
+│ ┌──────────────────────────────────────────────────────┐   │
+│ │ 1. Recibe notificación de cambio de estado           │   │
+│ │ 2. Ve su reporte marcado como resuelto               │   │
+│ │ 3. Si es público, aparece en feed de la comunidad    │   │
+│ └──────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 2. Flujo de Registro y Verificación
+
+```
+Registro → Email de Verificación (24h) → Activación → Login
+                                              ↓
+                        (Cada año) ← Confirmación Anual
+                                              ↓
+                        (Si no confirma en 30 días) → Cuenta Desactivada
+```
+
+### 3. Arquitectura del Sistema
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│                         INTERNET                              │
+│                        (HTTPS/SSL)                            │
+└───────────────────────────────────────────────────────────────┘
+                              ↓
+┌───────────────────────────────────────────────────────────────┐
+│                   NGINX (Reverse Proxy)                       │
+│  - Puerto 80/443                                              │
+│  - Redirección HTTP → HTTPS                                   │
+│  - Certificado Let's Encrypt                                  │
+└───────────────────────────────────────────────────────────────┘
+                    ↙                    ↘
+┌─────────────────────────┐    ┌─────────────────────────────┐
+│   FRONTEND (Next.js)    │    │   BACKEND (Express)         │
+│   - Puerto 3000         │    │   - Puerto 3001             │
+│   - SSR + Static        │    │   - API REST                │
+│   - PM2 Process         │    │   - JWT Auth                │
+│   - TypeScript          │    │   - Multer (uploads)        │
+└─────────────────────────┘    │   - Cron Jobs               │
+                               │   - PM2 Process             │
+                               └─────────────────────────────┘
+                                           ↓
+                              ┌──────────────────────┐
+                              │   MySQL Database     │
+                              │   - Prisma ORM       │
+                              │   - Migraciones      │
+                              │   - Usuarios         │
+                              │   - Reportes         │
+                              └──────────────────────┘
+```
+
+## 🔧 Características Técnicas Especiales
+
+### Autenticación JWT
+- Tokens firmados con `JWT_SECRET`
+- Expiración configurable (default: 24h)
+- Middleware de protección de rutas
+- Refresh token automático
+
+### Sistema de Roles y Permisos
+```javascript
+Roles: ['estudiante', 'personal', 'admin']
+
+Permisos:
+- Estudiante: Crear reportes, ver sus propios reportes
+- Personal: Ver todos, cambiar estados, asignar prioridades
+- Admin: Todo lo anterior + gestión de usuarios
+```
+
+### Subida de Imágenes
+- Multer para manejo de archivos
+- Límite: 5MB por imagen
+- Formatos: PNG, JPG, JPEG, GIF
+- Almacenamiento: `/uploads/` en servidor
+- URL generada automáticamente: `https://josmardev.me/uploads/[nombre-archivo]`
+
+### Feed Público
+- Solo reportes marcados como públicos por el personal
+- Visibles para todos los estudiantes
+- Fomenta transparencia y confianza en el sistema
 
 ## 📋 Requisitos Previos
 
@@ -439,34 +699,262 @@ cd frontend
 npm run build
 npm start
 ```
+CJM4LJkmdVeC
+ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=5 root@46.225.210.163
+## 🚀 Despliegue en Producción
 
-## 🚀 Despliegue
+### Deployment Actual (Hetzner Cloud)
 
-### Opciones de Hosting
+Este proyecto está desplegado en un VPS de Hetzner Cloud con la siguiente configuración:
+
+**Servidor:**
+- **Proveedor**: Hetzner Cloud
+- **SO**: Ubuntu 24.04 LTS
+- **Specs**: 4GB RAM, 2 vCPU, 40GB SSD
+- **IP**: 46.225.210.163
+- **Dominio**: josmardev.me
+
+**Stack en producción:**
+```
+Internet (HTTPS) 
+    ↓
+Nginx (Reverse Proxy + SSL)
+    ↓
+PM2 Process Manager
+    ├─→ Backend (Node.js:3001)
+    └─→ Frontend (Next.js:3000)
+    ↓
+MySQL (localhost:3306)
+```
+
+### Pasos de Despliegue (Resumen)
+
+#### 1. Preparar Servidor
+
+```bash
+# Actualizar sistema
+sudo apt update && sudo apt upgrade -y
+
+# Instalar Node.js 20
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Instalar MySQL
+sudo apt install mysql-server -y
+
+# Instalar Nginx
+sudo apt install nginx -y
+
+# Instalar PM2 globalmente
+sudo npm install -g pm2
+```
+
+#### 2. Configurar MySQL
+
+```bash
+sudo mysql
+CREATE DATABASE mantenimiento_utp;
+CREATE USER 'josmar'@'localhost' IDENTIFIED BY 'password123';
+GRANT ALL PRIVILEGES ON mantenimiento_utp.* TO 'josmar'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+#### 3. Clonar y Configurar Proyecto
+
+```bash
+cd /var/www
+git clone <tu-repositorio> Sistema-de-Reportes-de-Mantenimiento-UTP
+cd Sistema-de-Reportes-de-Mantenimiento-UTP
+
+# Instalar dependencias backend
+npm install
+
+# Configurar .env
+nano .env
+# (Agregar variables de producción)
+
+# Generar Prisma Client y ejecutar migraciones
+npx prisma generate
+npx prisma migrate deploy
+
+# Instalar dependencias frontend
+cd frontend
+npm install
+
+# Build de producción
+npm run build
+cd ..
+```
+
+#### 4. Configurar PM2
+
+```bash
+# Iniciar backend
+pm2 start src/server.js --name mantenimiento-api
+
+# Iniciar frontend
+cd frontend
+pm2 start npm --name mantenimiento-frontend -- start
+
+# Guardar configuración PM2
+pm2 save
+pm2 startup
+
+# Verificar procesos
+pm2 status
+```
+
+#### 5. Configurar Nginx
+
+Crear archivo `/etc/nginx/sites-available/mantenimiento`:
+
+```nginx
+server {
+    listen 80;
+    server_name josmardev.me www.josmardev.me 46.225.210.163;
+
+    client_max_body_size 10M;
+
+    # Frontend
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Backend API
+    location /api {
+        proxy_pass http://localhost:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Uploads (archivos estáticos)
+    location /uploads {
+        alias /var/www/Sistema-de-Reportes-de-Mantenimiento-UTP/uploads;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+}
+```
+
+```bash
+# Activar sitio
+sudo ln -s /etc/nginx/sites-available/mantenimiento /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+#### 6. Configurar SSL con Let's Encrypt
+
+```bash
+# Instalar Certbot
+sudo apt install certbot python3-certbot-nginx -y
+
+# Obtener certificado SSL
+sudo certbot --nginx -d josmardev.me -d www.josmardev.me \
+  --email tu_email@gmail.com --agree-tos --non-interactive --redirect
+
+# Verificar renovación automática
+sudo certbot renew --dry-run
+```
+
+#### 7. Configurar Firewall
+
+```bash
+# Habilitar UFW
+sudo ufw allow OpenSSH
+sudo ufw allow 'Nginx Full'
+sudo ufw enable
+
+# Verificar estado
+sudo ufw status
+```
+
+#### 8. Actualizar Variables de Entorno para HTTPS
+
+**Backend `.env`:**
+```env
+API_URL=https://josmardev.me
+FRONTEND_URL=https://josmardev.me
+```
+
+**Frontend `.env.production`:**
+```env
+NEXT_PUBLIC_API_URL=https://josmardev.me/api
+```
+
+Rebuild y reiniciar:
+```bash
+cd frontend
+npm run build
+pm2 restart all
+```
+
+### Comandos Útiles de Mantenimiento
+
+```bash
+# Ver logs
+pm2 logs
+pm2 logs mantenimiento-api
+pm2 logs mantenimiento-frontend
+
+# Reiniciar procesos
+pm2 restart all
+pm2 restart mantenimiento-api
+
+# Ver status
+pm2 status
+
+# Monitorear recursos
+pm2 monit
+
+# Ver logs de Nginx
+sudo tail -f /var/log/nginx/access.log
+sudo tail -f /var/log/nginx/error.log
+```
+
+### Opciones Alternativas de Hosting
+
+Si no usas VPS, considera:
 
 **Backend:**
-- Render
-- Railway
-- Heroku
-- DigitalOcean
+- Railway (fácil deploy con GitHub)
+- Render (free tier disponible)
+- Heroku (requiere tarjeta)
+- DigitalOcean App Platform
 
 **Frontend:**
-- Vercel (recomendado)
-- Netlify
-- Railway
+- Vercel (ideal para Next.js, free tier generoso)
+- Netlify (buena integración con Git)
+- Railway (backend + frontend juntos)
 
 **Base de Datos:**
-- PlanetScale
-- Railway
-- Aiven
-- DigitalOcean Managed MySQL
+- PlanetScale (MySQL serverless, free tier)
+- Railway (incluye MySQL)
+- Aiven (managed databases)
 
-### Variables de Entorno en Producción
+### Variables de Entorno Requeridas en Producción
 
-Asegúrate de configurar:
-- `DATABASE_URL` - URL de MySQL en producción
-- `JWT_SECRET` - Secreto seguro y aleatorio
-- `NEXT_PUBLIC_API_URL` - URL del backend en producción
+**Backend:**
+- `PORT`, `API_URL`, `NODE_ENV`
+- `DATABASE_URL`
+- `JWT_SECRET`, `JWT_EXPIRES_IN`
+- `FRONTEND_URL`
+- `MAILGUN_API_KEY`, `MAILGUN_DOMAIN`, `MAILGUN_FROM`
+
+**Frontend:**
+- `NEXT_PUBLIC_API_URL`
 
 ## 📚 Documentación Adicional
 
@@ -488,21 +976,159 @@ Universidad Tecnológica de Panamá - 2026
 
 ---
 
-## 💡 Consejos
+## 💡 Consejos y Funcionalidades Especiales
 
-- 🔐 Cambia `JWT_SECRET` en producción
-- 📸 Las imágenes se guardan en `/uploads/`
-- 🎨 El sistema tiene soporte para modo oscuro
-- 📱 Todo el frontend es responsive
-- ✨ Los reportes tienen estados: Pendiente → En Proceso → Resuelto
-- 🏷️ Los reportes pueden tener prioridades: Baja, Media, Alta
-- 💬 El personal puede agregar notas de seguimiento
-- 📊 Los admins tienen acceso a estadísticas detalladas
+### 🔐 Seguridad
+- **JWT_SECRET**: Cambia siempre en producción a un string aleatorio largo (min 32 caracteres)
+- **Contraseñas**: Hasheadas con bcrypt (10 rounds)
+- **Tokens de verificación**: Generados con `crypto.randomBytes(32)`
+- **CORS**: Configurado para permitir solo dominios autorizados
 
-## 📧 Contacto
+### 📸 Sistema de Imágenes
+- Las imágenes se guardan en `/uploads/` con nombres únicos
+- **Límite**: 5MB por imagen
+- **Formatos soportados**: PNG, JPG, JPEG, GIF
+- URLs generadas automáticamente: `https://josmardev.me/uploads/[nombre-archivo]`
+- Next.js Image Optimization para carga rápida
 
-Para soporte o preguntas, contacta al equipo de desarrollo.
+### 📧 Verificación Anual Automática
+**⚠️ IMPORTANTE**: Esta es una característica única del sistema:
+
+- **Al registrarse**: El usuario recibe el mensaje "Recuerda: cada año recibirás un correo para confirmar que sigues siendo parte de la UTP."
+- **Cron diario**: Cada día a las 8:00 AM, el sistema ejecuta un proceso automático
+- **Verificación**: Busca cuentas que cumplan 1 año desde su última confirmación
+- **Email automático**: Envía recordatorio con enlace de confirmación
+- **Plazo**: Usuario tiene 30 días para confirmar
+- **Desactivación**: Si no confirma, la cuenta se desactiva automáticamente
+- **Reactivación**: Solo administradores pueden reactivar cuentas
+
+**¿Por qué existe esto?**
+Para mantener la base de datos limpia y asegurar que solo usuarios activos de la UTP tengan acceso.
+
+### 🎨 Interfaz
+- **Modo oscuro**: Soporte completo para tema oscuro
+- **Responsive**: Funciona en desktop, tablet y móvil
+- **Sidebar colapsable**: En móvil se vuelve drawer hamburguesa
+- **Toast notifications**: Feedback instantáneo para todas las acciones
+
+### 🔄 Estados de Reportes
+```
+PENDIENTE → EN PROCESO → RESUELTO
+   (🟡)       (🔵)        (✅)
+```
+
+### 🏷️ Sistema de Prioridades
+- **Baja**: Problemas menores, no urgentes
+- **Media**: Necesita atención pronto (default)
+- **Alta**: Requiere acción inmediata
+
+### 💬 Notas del Personal
+- El personal puede agregar **notas privadas** en cada reporte
+- Solo visible para personal y administradores
+- Útil para coordinar trabajos entre equipos
+
+### 🌐 Feed Público
+- El personal decide qué reportes **resueltos** se muestran públicamente
+- **Objetivo**: Transparencia y confianza en el sistema
+- Los estudiantes ven que los reportes sí se resuelven
+- Fomenta más participación en reportar problemas
+
+### 📊 Estadísticas para Admins
+- Gráficos de reportes por categoría
+- Análisis por ubicación (edificios más problemáticos)
+- Métricas de tiempo de resolución
+- Reportes activos vs resueltos
+
+### 🔄 Cron Jobs Activos
+El sistema ejecuta automáticamente:
+1. **Verificación anual** (8:00 AM diario)
+2. **Limpieza de tokens expirados** (cuando sea necesario)
+
+### 📱 Notificaciones por Email
+El sistema envía emails en estos casos:
+1. Bienvenida y verificación de cuenta
+2. Recuperación de contraseña
+3. Confirmación anual (cada año)
+4. Cambio de estado del reporte (opcional, configurable)
+
+## 📋 Variables de Entorno Explicadas
+
+### Backend (.env)
+```env
+# Puerto del servidor
+PORT=3001
+
+# URL del API para construcción de URLs de imágenes
+API_URL=https://josmardev.me
+
+# Ambiente (development, production)
+NODE_ENV=production
+
+# MySQL Database
+DATABASE_URL="mysql://usuario:password@localhost:3306/mantenimiento_utp"
+
+# JWT Auth
+JWT_SECRET=un_secreto_muy_largo_y_aleatorio_cambialo_en_produccion
+JWT_EXPIRES_IN=24h
+
+# Frontend URL para CORS y emails
+FRONTEND_URL=https://josmardev.me
+
+# Mailgun Email Service
+MAILGUN_API_KEY=tu_api_key_de_mailgun
+MAILGUN_DOMAIN=mg.tudominio.com
+MAILGUN_FROM=Sistema UTP <noreply@mg.tudominio.com>
+```
+
+### Frontend (.env.production)
+```env
+# URL del backend API
+NEXT_PUBLIC_API_URL=https://josmardev.me/api
+```
+
+## 🚀 Información de Despliegue
+
+**Sistema actualmente desplegado en:**
+- 🌐 **URL**: https://josmardev.me
+- 🔒 **SSL**: Let's Encrypt (renovación automática)
+- 🖥️ **Servidor**: Hetzner Cloud VPS (Ubuntu 24.04)
+- 🔄 **Process Manager**: PM2 (auto-restart en crash)
+- 🌐 **Web Server**: Nginx (reverse proxy)
+- 📧 **Emails**: Mailgun API
+
+## 📧 Contacto y Soporte
+
+Para soporte técnico, reportar bugs o sugerencias de mejora:
+
+- 📧 Email: development@utp.ac.pa
+- 🌐 Sistema en producción: [https://josmardev.me](https://josmardev.me)
+- 📚 Repositorio: GitHub (este proyecto)
+
+### Créditos
+
+**Desarrollado para la Universidad Tecnológica de Panamá**  
+Sistema de Reportes de Mantenimiento - 2026
+
+**Tecnologías principales:**
+- Frontend: Next.js 14 + TypeScript + Tailwind CSS
+- Backend: Node.js + Express + Prisma ORM
+- Base de Datos: MySQL
+- Infraestructura: Nginx + PM2 + Let's Encrypt
+
+---
+
+## 🎯 Próximas Funcionalidades (Roadmap)
+
+- [ ] App móvil nativa (iOS/Android)
+- [ ] Notificaciones push en tiempo real
+- [ ] Chat entre estudiante y personal
+- [ ] Sistema de valoraciones de resolución
+- [ ] Dashboard público con estadísticas generales
+- [ ] Integración con sistema de tickets UTP
+- [ ] API pública para integraciones
 
 ---
 
 **¡Gracias por usar el Sistema de Reportes de Mantenimiento UTP!** 🎓
+
+**Sistema en vivo**: [https://josmardev.me](https://josmardev.me) 🔒✅

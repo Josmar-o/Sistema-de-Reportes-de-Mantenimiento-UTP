@@ -22,8 +22,13 @@ const PORT = process.env.PORT || 3001;
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
-  process.env.FRONTEND_URL,
-].filter(Boolean);
+  'http://46.225.210.163',
+  'http://josmardev.me',
+  'http://www.josmardev.me',
+  'https://46.225.210.163',
+  'https://josmardev.me',
+  'https://www.josmardev.me',
+];
 
 app.use(cors({
   origin: (origin, callback) => {
